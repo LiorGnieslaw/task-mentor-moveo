@@ -1,0 +1,25 @@
+.lobby-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+  
+.code-block-link {
+    display: block;
+    width: 50%; 
+    padding: 20px;
+    text-align: center;
+    background-color: #101374b5; 
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: bold;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    transition: background-color 0.3s ease-in-out;
+}
+  
+.code-block-link:hover {
+    background-color: #070a4cda;
+}
+  

@@ -1,0 +1,15 @@
+.app-header {
+    background-color: #101374eb; 
+    color: #ffffff;
+    padding: 15px;
+    font-size: 24px;
+    text-align: center;
+}
+  
+.app-main-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+  
