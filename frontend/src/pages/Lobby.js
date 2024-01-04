@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { SocketService } from '../socket/SocketService';
+
 import './Lobby.css';
 
 const Lobby = () => {

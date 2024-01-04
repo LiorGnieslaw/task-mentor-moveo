@@ -3,71 +3,75 @@ import { Link, useParams } from 'react-router-dom';
 import hljs from 'highlight.js/lib/core';
 import javascript from 'highlight.js/lib/languages/javascript';
 import 'highlight.js/styles/atom-one-dark.css';
-import io from 'socket.io-client';
 import { SlActionUndo } from 'react-icons/sl';
+import { SocketService } from '../../socket/SocketService';
 import './CodeBlock.css';
 
 const CodeBlock = () => {
   const { title } = useParams();
   const [code, setCode] = useState('');
   const [isMentor, setIsMentor] = useState(false);
-  const socket = io('http://localhost:4000');
 
   hljs.registerLanguage('javascript', javascript);
 
+  const fetchData = async () => { 
+    try {
+      const response = await fetch(`http://localhost:4000/code/${title}`);
+      const data = await response.json();
+      const initialCode = data.code || '';
+      const { value: highlightedCode } = hljs.highlight('javascript', initialCode);
+      setCode(highlightedCode);
+      hljs.highlightAll();
+    } catch (error) {
+      console.error('Error fetching code block:', error);
+    }
+};
+
+const updateMentorFlag = () => {
+  try {
+    const storedMentorFlag = localStorage.getItem(`${title}-isMentor`);
+
+    if (storedMentorFlag === null) {
+      localStorage.setItem(`${title}-isMentor`, 'true');
+      setIsMentor(true);
+    }
+  } catch (error) {
+    console.error('Error updating mentor flag:', error);
+  }
+};
+
+SocketService.init(); 
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`http://localhost:4000/code/${title}`);
-        const data = await response.json();
-
-        const initialCode = data.code || '';
-        const highlightedCode = hljs.highlight('javascript', initialCode).value;
-        setCode(highlightedCode);
-        hljs.highlightAll();
-      } catch (error) {
-        console.error('Error fetching code block:', error);
-      }
-  };
-
-    const updateMentorFlag = () => {
-      try {
-        const storedMentorFlag = localStorage.getItem(`${title}-isMentor`);
-    
-        if (storedMentorFlag === null) {
-          localStorage.setItem(`${title}-isMentor`, 'true');
-          setIsMentor(true);
-        }
-
-      } catch (error) {
-        console.error('Error updating mentor flag:', error);
-      }
-    };
 
     fetchData(); 
     updateMentorFlag();
+    
+    //This is my try for setting the mentor with the socket and not with local storage.
+    
+    // SocketService.on('userInfo', ({ isMentor }) => {
+    //   setIsMentor(isMentor);
+    // });
 
-    socket.on("codeChange", ( { title, code } ) => {
-      console.log('Code change received:', code);
-      const highlightedCode = hljs.highlight('javascript', code).value;
+    SocketService.terminate('codeChange'); 
+    SocketService.on("codeChange", ( { title, code } ) => {
+      const { value: highlightedCode } = hljs.highlight('javascript', code);
       setCode(highlightedCode);
     });
 
-    socket.emit('joinCodeBlock', { title });
+    SocketService.emit('userJoined', { title });
 
     return () => {
-      socket.off('codeChange');
+        SocketService.terminate('codeChange');
     };
-
-  }, [title, code, socket]);
+  }, []);
 
   const handleCodeChange = (code) => {
     if (!isMentor) {
-      console.log('Student is changing code:', code);
-      const highlightedCode = hljs.highlight('javascript', code).value;
+      const { value: highlightedCode } = hljs.highlight('javascript', code);
       setCode(highlightedCode);
   
-      socket.emit('codeChange', { title, code: highlightedCode });
+      SocketService.emit('codeChange', { title, code: highlightedCode });
     }
   };
 
@@ -96,7 +100,7 @@ return (
                 <code className="highlighted-code"
                 contentEditable
                 suppressContentEditableWarning
-                onBlur={(e) => handleCodeChange(e.target.textContent)}
+                onBlur={(e) => handleCodeChange(e.target.innerText)}
                 dangerouslySetInnerHTML={{ __html: code }}
                 />
             </div>

@@ -1,8 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Lobby from './pages/Lobby';
-import CodeBlock from './components/CodeBlock';
-import Header from './components/Header';
+import CodeBlock from './components/codeblock/CodeBlock';
+import Header from './components/header/Header';
 import './App.css';
 
 const App = () => {

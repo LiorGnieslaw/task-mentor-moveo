@@ -2,7 +2,6 @@ const app  = require('express')();
 const server = require('http').createServer(app);
 const { Server } = require('socket.io');
 const connectDB = require('./config/db');
-const CodeBlock = require('./models/CodeBlock');
 const codeBlockController = require('./controllers/codeBlockControllers');
 const cors = require('cors');
 app.use(cors());
@@ -19,24 +18,24 @@ connectDB();
 app.get('/code-blocks', codeBlockController.getCodeBlocks);
 app.get('/code/:title', codeBlockController.getCodeBlock);
 
+//This is my try for setting the mentor with the socket and not with local storage.
+// let sockets = [];
+
+
 io.on('connection', (socket) => {
-    console.log(`User Connected: ${socket.id}`);
+    //This is my try for setting the mentor with the socket and not with local storage.
+    // sockets.push(socket);
+    // const isMentor = sockets.length === 0;
+    // socket.emit("userInfo", { isMentor });
 
     socket.on('joinCodeBlock', ({ title }) => {
         socket.join(title);
-        
-        const codeBlock = CodeBlock.findOne({ title });
-        io.to(title).emit('codeChange', { title, code: codeBlock.code || ''});
+        io.to(title).emit('userJoined');
     });
   
     socket.on('codeChange', ({ title, code }) => {
-        console.log('RECIEVED THE CODE', code)
         io.to(title).emit('codeChange', { title, code });
       });
- 
-    socket.on('disconnect', () => {
-        console.log('A user disconnected');
-    });
 });
 
 server.listen(4000, () => {
