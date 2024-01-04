@@ -2,6 +2,7 @@ const app  = require('express')();
 const server = require('http').createServer(app);
 const { Server } = require('socket.io');
 const connectDB = require('./config/db');
+import CodeBlock from './models/CodeBlock';
 const codeBlockController = require('./controllers/codeBlockControllers');
 const cors = require('cors');
 app.use(cors());
@@ -28,8 +29,13 @@ io.on('connection', (socket) => {
     // const isMentor = sockets.length === 0;
     // socket.emit("userInfo", { isMentor });
 
-    socket.on('joinCodeBlock', ({ title }) => {
+    socket.on('joinCodeBlock', async ({ title }) => {
         socket.join(title);
+        const codeBlock = await CodeBlock.findOne({ title });
+
+        if (!codeBlock) {
+            await CodeBlock.create({ title });
+    }
         io.to(title).emit('userJoined');
     });
   
