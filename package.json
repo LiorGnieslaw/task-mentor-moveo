@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "serve -s build",
-    "build": "react-scripts build",
+    "build": "react-scripts build --output-path=build",
     "dev": "react-scripts start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
