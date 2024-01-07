@@ -7,29 +7,9 @@ const connectDB = require('./config/db');
 const CodeBlock = require('./models/CodeBlock');
 const codeBlockController = require('./controllers/codeBlockControllers');
 
-const corsOptions = {
-    origin: "http://localhost:3000",
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    credentials: true,
-    optionsSuccessStatus: 204
-};
+app.use(cors());
 
-app.use(cors(corsOptions));
-// app.use(cors());
-
-const io = new Server(server, {
-    cors: {
-        origin: "http://localhost:3000",
-        methods: ["GET", "POST"]
-    }
-});
-
-app.use((req, res, next) => {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-    next();
-  })
+const io = new Server(server);
 
 connectDB();
 

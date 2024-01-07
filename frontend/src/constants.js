@@ -1,0 +1,1 @@
+export const BASE_URL = "https://task-mentor-moveo-backend.onrender.com";

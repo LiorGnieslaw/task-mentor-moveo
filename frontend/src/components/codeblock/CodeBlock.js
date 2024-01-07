@@ -5,6 +5,7 @@ import javascript from 'highlight.js/lib/languages/javascript';
 import 'highlight.js/styles/atom-one-dark.css';
 import { SlActionUndo } from 'react-icons/sl';
 import { SocketService } from '../../socket/SocketService';
+import { BASE_URL } from '../../constants';
 import './CodeBlock.css';
 
 const CodeBlock = () => {
@@ -16,7 +17,7 @@ const CodeBlock = () => {
 
   const fetchData = async () => { 
     try {
-      const response = await fetch(`http://localhost:4000/code/${title}`);
+      const response = await fetch(`${BASE_URL}/code/${title}`);
       const data = await response.json();
       const initialCode = data.code || '';
       const { value: highlightedCode } = hljs.highlight('javascript', initialCode);

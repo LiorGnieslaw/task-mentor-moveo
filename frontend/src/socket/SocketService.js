@@ -1,6 +1,8 @@
 import io from "socket.io-client";
+import { BASE_URL } from "../constants";
+
 let socket = null;
-const url = encodeURI("http://localhost:4000");
+const url = encodeURI(BASE_URL);
 export const SocketService = {
   init,
   terminate,
