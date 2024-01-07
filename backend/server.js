@@ -1,14 +1,28 @@
 const app  = require('express')();
 const server = require('http').createServer(app);
+const cors = require('cors');
 const { Server } = require('socket.io');
 const port = process.env.PORT || 4000;
 const connectDB = require('./config/db');
 const CodeBlock = require('./models/CodeBlock');
 const codeBlockController = require('./controllers/codeBlockControllers');
-const cors = require('cors');
-app.use(cors());
 
-const io = new Server(server);
+const corsOptions = {
+    origin: "http://localhost:3000",
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true,
+    optionsSuccessStatus: 204
+};
+
+app.use(cors(corsOptions));
+// app.use(cors());
+
+const io = new Server(server, {
+    cors: {
+        origin: "http://localhost:3000",
+        methods: ["GET", "POST"]
+    }
+});
 
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
