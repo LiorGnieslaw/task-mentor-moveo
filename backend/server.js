@@ -1,6 +1,7 @@
 const app  = require('express')();
 const server = require('http').createServer(app);
 const { Server } = require('socket.io');
+const port = process.env.PORT || 4000;
 const connectDB = require('./config/db');
 import CodeBlock from './models/CodeBlock';
 const codeBlockController = require('./controllers/codeBlockControllers');
@@ -44,6 +45,6 @@ io.on('connection', (socket) => {
       });
 });
 
-server.listen(4000, () => {
+server.listen(port, () => {
     console.log("Server is running on port 4000")
 });
