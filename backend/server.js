@@ -3,7 +3,7 @@ const server = require('http').createServer(app);
 const { Server } = require('socket.io');
 const port = process.env.PORT || 4000;
 const connectDB = require('./config/db');
-import CodeBlock from './models/CodeBlock';
+const CodeBlock = require ('./models/CodeBlock');
 const codeBlockController = require('./controllers/codeBlockControllers');
 const cors = require('cors');
 app.use(cors());
