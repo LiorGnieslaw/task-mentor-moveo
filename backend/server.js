@@ -8,12 +8,7 @@ const codeBlockController = require('./controllers/codeBlockControllers');
 const cors = require('cors');
 app.use(cors());
 
-const io = new Server(server, {
-    cors: {
-        origin: '*',
-        methods: ["GET", "POST"],
-    },
-});
+const io = new Server(server);
 
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
