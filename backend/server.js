@@ -15,6 +15,13 @@ const io = new Server(server, {
     },
 });
 
+app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    next();
+  })
+
 connectDB();
 
 app.get('/code-blocks', codeBlockController.getCodeBlocks);
