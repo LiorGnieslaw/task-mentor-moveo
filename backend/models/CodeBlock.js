@@ -4,7 +4,7 @@ const codeBlockSchema = new mongoose.Schema(
   {
   title: { type: String, required: true },
   code: { type: String, default: '' },
-  isMentor: { type: Boolean, default: false },
+  solution: { type: String, default: '' },
   }
 );
 

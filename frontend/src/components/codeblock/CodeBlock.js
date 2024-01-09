@@ -11,7 +11,9 @@ import './CodeBlock.css';
 const CodeBlock = () => {
   const { title } = useParams();
   const [code, setCode] = useState('');
+  const [solution, setSolution] = useState('');
   const [isMentor, setIsMentor] = useState(false);
+  const [isShowSmiley, setIsShowSmiley] = useState(false);
 
   hljs.registerLanguage('javascript', javascript);
 
@@ -20,6 +22,7 @@ const CodeBlock = () => {
           const response = await fetch(`${BASE_URL}/code/${title}`);
           const data = await response.json();
           const initialCode = data.code || '';
+          setSolution(data.solution || '');
           const { value: highlightedCode } = hljs.highlight('javascript', initialCode);
           setCode(highlightedCode);
           hljs.highlightAll();
@@ -52,6 +55,15 @@ const CodeBlock = () => {
 
   const handleCodeChange = (newCode) => {
     SocketService.emit(`codeChange`, {title, newCode});
+    if (newCode === solution) {
+      setIsShowSmiley(true);
+      setTimeout(() => {
+        setIsShowSmiley(false)
+      },2000)
+
+    } else {
+      setIsShowSmiley(false);
+    }
   };
   
 return (
@@ -83,6 +95,9 @@ return (
                 dangerouslySetInnerHTML={{ __html: code }}
                 />
             </div>
+            { isShowSmiley && (
+                <div className="smiley-face">😊</div>
+            )}
             </React.Fragment>
           )}
     </div>

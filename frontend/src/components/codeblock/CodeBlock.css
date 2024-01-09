@@ -56,4 +56,10 @@
     background: #070a4cda;
   }
   
+  .smiley-face {
+    font-size: 20em;
+    position: absolute;
+    top: 25%;
+    left: 25%;
+  }
   
