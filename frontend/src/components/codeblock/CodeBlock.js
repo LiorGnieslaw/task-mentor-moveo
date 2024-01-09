@@ -36,12 +36,7 @@ const CodeBlock = () => {
     fetchData(); 
     SocketService.init();
     SocketService.emit('joinCodeBlock', title);
-
-    SocketService.on('mentorConnection', (isMentor) => {
-      setIsMentor(isMentor);
-    });
-
-
+    SocketService.on('mentorConnection', (isMentor) => setIsMentor(isMentor));
     SocketService.on(`getCode`, (newCode) => {
       const { value: highlightedCode } = hljs.highlight('javascript', newCode);
       hljs.highlightAll();
@@ -60,7 +55,6 @@ const CodeBlock = () => {
       setTimeout(() => {
         setIsShowSmiley(false)
       },2000)
-
     } else {
       setIsShowSmiley(false);
     }

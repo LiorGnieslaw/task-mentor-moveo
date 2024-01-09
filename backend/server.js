@@ -2,10 +2,8 @@ const app  = require('express')();
 const server = require('http').createServer(app);
 const cors = require('cors');
 const { Server } = require('socket.io');
-const port = process.env.PORT || 4000;
 const connectDB = require('./config/db');
 const CodeBlock = require('./models/CodeBlock');
-const codeBlockController = require('./controllers/codeBlockControllers');
 
 app.use(cors());
 
@@ -13,22 +11,16 @@ const io = new Server(server);
 
 connectDB();
 
-const mentorTrackDict = {
-    'Async Case': false,
-    'Second Case': false,
-    'Third Case': false,
-    'Fourth Case': false,
-    'Fifth Case': false,
-  };
-
+let isCodeBlocksInit = true;
+let mentorTrackMap = {};
 let isMentor = false;
 
 io.on('connection', (socket) => {
     socket.on('joinCodeBlock', (title) => {
         socket.join(title);
-        if (mentorTrackDict[title] === false){
+        if (mentorTrackMap[title] === false){
             isMentor = true;
-            mentorTrackDict[title] = true
+            mentorTrackMap[title] = true
             socket.emit('mentorConnection', isMentor);
         }
       });
@@ -42,8 +34,31 @@ io.on('connection', (socket) => {
     });
   });
 
-app.get('/code-blocks', codeBlockController.getCodeBlocks);
-app.get('/code/:title', codeBlockController.getCodeBlock);
+app.get('/code-blocks', async (req,res) => {
+  try {
+    const codeBlocks = await CodeBlock.find({});
+    res.json(codeBlocks);
+    if (isCodeBlocksInit){
+      for ( const { title } of codeBlocks){
+        mentorTrackMap[title] = false;
+      }
+    }
+      isCodeBlocksInit = false;
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+app.get('/code/:title', async (req,res) => {
+  try {
+    const { title } = req.params;
+    const codeBlock = await CodeBlock.findOne({ title });
+    res.json(codeBlock);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+const port = process.env.PORT || 4000;
 
 server.listen(port, () => {
     console.log(`Server is running on port ${port}`)
