@@ -29,9 +29,7 @@ io.on('connection', (socket) => {
         io.to(title).emit('getCode', newCode);
     });
 
-    socket.on('disconnect', () => {
-        console.log(`Client ${socket.id} disconnected.`);
-    });
+    socket.on('disconnect', () => {});
   });
 
 app.get('/code-blocks', async (req,res) => {
