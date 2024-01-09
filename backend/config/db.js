@@ -3,7 +3,10 @@ const uri = "mongodb+srv://liorgni4:Lg123456@cluster0.wjhic2b.mongodb.net/sample
 
 const connectDB = async () => {
   try {
-    await mongoose.connect(uri);
+    await mongoose.connect(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    });
     console.log('MongoDB Connected');
   } catch (error) {
     process.exit(1);

@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { BASE_URL } from '../constants';
-
 import './Lobby.css';
 
 const Lobby = () => {
     const [codeBlocks, setCodeBlocks] = useState([]);
-
+    
     useEffect(() => {
         fetch(`${BASE_URL}/code-blocks`)
         .then(response => response.json())

@@ -12,7 +12,7 @@ export const SocketService = {
 
 function init() {
     if (!socket) {
-        socket = io(url);
+        socket = io(url, { transports: ['websocket'], cors: { origin: '*' } });
     }
 }
 

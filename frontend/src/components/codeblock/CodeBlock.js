@@ -16,66 +16,44 @@ const CodeBlock = () => {
   hljs.registerLanguage('javascript', javascript);
 
   const fetchData = async () => { 
-    try {
-      const response = await fetch(`${BASE_URL}/code/${title}`);
-      const data = await response.json();
-      const initialCode = data.code || '';
-      const { value: highlightedCode } = hljs.highlight('javascript', initialCode);
-      setCode(highlightedCode);
-      hljs.highlightAll();
-    } catch (error) {
-      console.error('Error fetching code block:', error);
-    }
-};
+        try {
+          const response = await fetch(`${BASE_URL}/code/${title}`);
+          const data = await response.json();
+          const initialCode = data.code || '';
+          const { value: highlightedCode } = hljs.highlight('javascript', initialCode);
+          setCode(highlightedCode);
+          hljs.highlightAll();
+        } catch (error) {
+          console.error('Error fetching code block:', error);
+        }
+    };
 
-const updateMentorFlag = () => {
-  try {
-    const storedMentorFlag = localStorage.getItem(`${title}-isMentor`);
-
-    if (storedMentorFlag === null) {
-      localStorage.setItem(`${title}-isMentor`, 'true');
-      setIsMentor(true);
-    }
-  } catch (error) {
-    console.error('Error updating mentor flag:', error);
-  }
-};
-
-SocketService.init(); 
 
   useEffect(() => {
-
     fetchData(); 
-    updateMentorFlag();
-    
-    //This is my try for setting the mentor with the socket and not with local storage.
-    
-    // SocketService.on('userInfo', ({ isMentor }) => {
-    //   setIsMentor(isMentor);
-    // });
+    SocketService.init();
+    SocketService.emit('joinCodeBlock', title);
 
-    SocketService.terminate('codeChange'); 
-    SocketService.on("codeChange", ( { title, code } ) => {
-      const { value: highlightedCode } = hljs.highlight('javascript', code);
-      setCode(highlightedCode);
+    SocketService.on('mentorConnection', (isMentor) => {
+      setIsMentor(isMentor);
     });
 
-    SocketService.emit('userJoined', { title });
 
+    SocketService.on(`getCode`, (newCode) => {
+      const { value: highlightedCode } = hljs.highlight('javascript', newCode);
+      hljs.highlightAll();
+      setCode(highlightedCode);
+    });
+  
     return () => {
-        SocketService.terminate('codeChange');
+      SocketService.terminate();
     };
   }, []);
 
-  const handleCodeChange = (code) => {
-    if (!isMentor) {
-      const { value: highlightedCode } = hljs.highlight('javascript', code);
-      setCode(highlightedCode);
-  
-      SocketService.emit('codeChange', { title, code: highlightedCode });
-    }
+  const handleCodeChange = (newCode) => {
+    SocketService.emit(`codeChange`, {title, newCode});
   };
-
+  
 return (
     <React.Fragment>
     <div className="return-button-container">

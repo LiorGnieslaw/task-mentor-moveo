@@ -9,38 +9,42 @@ const codeBlockController = require('./controllers/codeBlockControllers');
 
 app.use(cors());
 
-const io = new Server(server);
+const io = new Server(server);  
 
 connectDB();
+
+const mentorTrackDict = {
+    'Async Case': false,
+    'Second Case': false,
+    'Third Case': false,
+    'Fourth Case': false,
+    'Fifth Case': false,
+  };
+
+let isMentor = false;
+
+io.on('connection', (socket) => {
+    socket.on('joinCodeBlock', (title) => {
+        socket.join(title);
+        if (mentorTrackDict[title] === false){
+            isMentor = true;
+            mentorTrackDict[title] = true
+            socket.emit('mentorConnection', isMentor);
+        }
+      });
+  
+    socket.on(`codeChange`, ({title, newCode}) => {
+        io.to(title).emit('getCode', newCode);
+    });
+
+    socket.on('disconnect', () => {
+        console.log(`Client ${socket.id} disconnected.`);
+    });
+  });
 
 app.get('/code-blocks', codeBlockController.getCodeBlocks);
 app.get('/code/:title', codeBlockController.getCodeBlock);
 
-//This is my try for setting the mentor with the socket and not with local storage.
-// let sockets = [];
-
-
-io.on('connection', (socket) => {
-    //This is my try for setting the mentor with the socket and not with local storage.
-    // sockets.push(socket);
-    // const isMentor = sockets.length === 0;
-    // socket.emit("userInfo", { isMentor });
-
-    socket.on('joinCodeBlock', async ({ title }) => {
-        socket.join(title);
-        const codeBlock = await CodeBlock.findOne({ title });
-
-        if (!codeBlock) {
-            await CodeBlock.create({ title });
-    }
-        io.to(title).emit('userJoined');
-    });
-  
-    socket.on('codeChange', ({ title, code }) => {
-        io.to(title).emit('codeChange', { title, code });
-      });
-});
-
 server.listen(port, () => {
-    console.log("Server is running on port 4000")
+    console.log(`Server is running on port ${port}`)
 });
